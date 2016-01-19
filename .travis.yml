@@ -1,5 +1,5 @@
 sudo: false
-# language: node_js
+language: node_js
 # node_js:
 # - '4'
 env:
@@ -16,14 +16,11 @@ before_script:
   - sh -e /etc/init.d/xvfb start
 
 before_install:
-  # nvm is not yet supported on osx, manually install
-  - git clone https://github.com/creationix/nvm.git /tmp/.nvm
-  - source /tmp/.nvm/nvm.sh
-  - nvm install $NODE_VERSION
-  - nvm use $NODE_VERSION
-
+  - git clone https://github.com/creationix/nvm.git /tmp/.nvm;
+    source /tmp/.nvm/nvm.sh;
+    nvm install $NODE_VERSION;
+    nvm use --delete-prefix $NODE_VERSION;
 install:
   - npm install
-
 script:
   - npm test
