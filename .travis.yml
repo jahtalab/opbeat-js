@@ -3,6 +3,9 @@ language: node_js
 node_js:
 - '4'
 
+os:
+  - osx
+
 addons:
   firefox: "38.0"
 
