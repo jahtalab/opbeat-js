@@ -1,5 +1,5 @@
 sudo: false
-language: cpp
+# language: cpp
 # node_js:
 # - '4'
 env:
