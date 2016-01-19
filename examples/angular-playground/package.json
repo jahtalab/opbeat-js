@@ -1,0 +1,16 @@
+{
+  "name": "angular-playground",
+  "version": "1.0.0",
+  "description": "Opbeat Angular Playground",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hamidreza Jahtalab",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.4.8",
+    "angular-route": "^1.4.8",
+    "opbeat-js": "^1.2.4"
+  }
+}
