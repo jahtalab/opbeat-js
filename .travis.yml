@@ -1,7 +1,9 @@
 sudo: false
-language: node_js
-node_js:
-- '4'
+# language: node_js
+# node_js:
+# - '4'
+env:
+  - NODE_VERSION="4.2"
 
 os:
   - osx
@@ -19,3 +21,9 @@ before_install:
   - source /tmp/.nvm/nvm.sh
   - nvm install $NODE_VERSION
   - nvm use $NODE_VERSION
+
+install:
+  - npm install
+
+script:
+  - npm test
