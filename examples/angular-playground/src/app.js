@@ -3,7 +3,7 @@ var app = angular.module('app', ['ngRoute', 'ngOpbeat'])
 app.config(function ($routeProvider) {
   var routeConfig = {
     controller: 'MainCtrl',
-    template: '<div ng-bind="test"></div>'
+    templateUrl: 'src/main_ctrl.html'
   }
 
   $routeProvider
@@ -24,9 +24,65 @@ app.config(function ($opbeatProvider) {
   })
 })
 
-app.controller('MainCtrl', function mainCtrl ($scope, $http) {
+app.controller('MainCtrl', function mainCtrl($scope, $http) {
   $scope.test = 'passed'
+  // function testFn() { }
+  // $scope.testFn = testFn
+  // $scope.$watch(testFn, function (newVal, oldVal) {
+  //   testFn()
+  // })
+
   $http.get('src/response.json').then(function () {
     $scope.done = 'done'
   })
 })
+
+
+app.directive('customDirective', function () {
+  return {
+    template: '<div ng-bind="test"></div>',
+    link: function link(scope, element, attrs, controller, transcludeFn) {
+      scope.test = 'customDirective'
+    }
+  }
+})
+
+
+function startApp() {
+  angular.bootstrap(document, ['app'])
+}
+
+var appZone = zone.fork({
+  onZoneCreated: function () {
+
+  },
+  beforeTask: function () {
+
+  },
+  afterTask: function () {
+
+  },
+  onError: function () {
+
+  },
+  enqueueTask: function () {
+
+  },
+  dequeueTask: function () {
+
+  },
+  setTimeout: function () {
+
+  },
+  setInterval: function () {
+
+  },
+  alert: function () {
+
+  },
+  prompt: function () {
+
+  }
+})
+
+appZone.run(startApp)

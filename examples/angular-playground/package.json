@@ -11,6 +11,7 @@
   "dependencies": {
     "angular": "^1.4.8",
     "angular-route": "^1.4.8",
-    "opbeat-js": "^1.2.4"
+    "opbeat-js": "^1.2.4",
+    "zone.js": "^0.5.10"
   }
 }
