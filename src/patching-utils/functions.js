@@ -3,15 +3,15 @@ function patchFunction (obj, fnNames, zone) {
     var delegate = obj[name]
     obj[name] = function () {
       if (typeof zone.beforeTask === 'function') {
-        zone.beforeTask.apply(zone)
+        zone.beforeTask.apply(zone, [zone])
       }
       var result = delegate.apply(obj, arguments)
       if (typeof zone.afterTask === 'function') {
-        zone.afterTask.apply(zone)
+        zone.afterTask.apply(zone, [zone])
       }
       return result
     }
   })
 }
 
-module.export = patchFunction
+module.exports = patchFunction
