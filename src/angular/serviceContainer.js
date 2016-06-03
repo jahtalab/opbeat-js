@@ -54,7 +54,7 @@ function ServiceContainer () {
   // window.angular.bootstrap = zoneService.zone.bind(window.angular.bootstrap)
   var _resumeDeferred = window.angular.resumeDeferredBootstrap
   window.name = 'NG_DEFER_BOOTSTRAP!' + window.name
-  window.angular.resumeDeferredBootstrap = zoneService.zone.bind(function () {
+  window.angular.resumeDeferredBootstrap = zoneService.zone.wrap(function () {
     var resumeBootstrap = window.angular.resumeBootstrap
     if (typeof _resumeDeferred === 'function') {
       resumeBootstrap = _resumeDeferred
@@ -75,24 +75,13 @@ ServiceContainer.prototype.createLogger = function () {
 
 ServiceContainer.prototype.createZoneService = function () {
   var logger = this.services.logger
-  // todo: remove this when updating to new version of zone.js
-  function noop () { }
-  var _warn = console.warn
-  console.warn = noop
 
-  if (typeof window.zone === 'undefined') {
+  if (typeof window.Zone === 'undefined') {
     require('zone.js')
   }
 
-  var zonePrototype = ('getPrototypeOf' in Object)
-    ? Object.getPrototypeOf(window.zone) : window.zone.__proto__ // eslint-disable-line 
-
-  zonePrototype.enqueueTask = noop
-  zonePrototype.dequeueTask = noop
-  console.warn = _warn
-
   var ZoneService = require('../transaction/zone_service')
-  return new ZoneService(window.zone, logger)
+  return new ZoneService(window.Zone.current, logger)
 }
 
 ServiceContainer.prototype.createOpbeatBackend = function () {
