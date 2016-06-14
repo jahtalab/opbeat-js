@@ -22,13 +22,26 @@ XHRPatch.prototype.applyPatch = function () {
         target: self
       }
       self[XHR_TASK] = task
+      var lastReadyState
+      var isOnLoadFired = false
       self.addEventListener('readystatechange', function () {
-        if (self.readyState === window.XMLHttpRequest.DONE) {
+        lastReadyState = self.readyState
+        if (self.readyState === window.XMLHttpRequest.DONE && isOnLoadFired) {
           if (!task.aborted) {
             xhrPatch.onInvokeTask(task)
           }
         }
       })
+
+      self.addEventListener('load', function () {
+        if (lastReadyState === window.XMLHttpRequest.DONE) {
+          if (!task.aborted) {
+            xhrPatch.onInvokeTask(task)
+          }
+        }
+        isOnLoadFired = true
+      })
+
       xhrPatch.onScheduleTask(task)
       delegate.apply(self, args)
     }
@@ -52,13 +65,67 @@ XHRPatch.prototype.applyPatch = function () {
     }
   })
 
-  this.patchEventTargetMethods(window.XMLHttpRequest.prototype)
+// this.patchEventTargetMethods(window.XMLHttpRequest.prototype)
 }
 
 // / event listeners patch
 
 var ADD_EVENT_LISTENER = 'addEventListener'
 var REMOVE_EVENT_LISTENER = 'removeEventListener'
+var EVENT_TASKS = opbeatSymbol('eventTasks')
+var SYMBOL_ADD_EVENT_LISTENER = opbeatSymbol(ADD_EVENT_LISTENER)
+var SYMBOL_REMOVE_EVENT_LISTENER = opbeatSymbol(REMOVE_EVENT_LISTENER)
+
+XHRPatch.prototype.patchEventTargetMethods1 = function (obj) {
+  var xhrPatch = this
+  var _global = window
+
+  if (obj && obj.addEventListener) {
+    patchUtils.patchMethod(obj, ADD_EVENT_LISTENER, function (delegate, delegateName, name) {
+      // return function (self, args) {
+      //   console.log('addEventListener ', self, args)
+      // }
+      return orderAwareAddEventListener
+    })
+    patchUtils.patchMethod(obj, REMOVE_EVENT_LISTENER, function () {
+      // return function (self, args) {
+      //   console.log('removeEventListener ', self, args)
+      // }
+      return zoneAwareRemoveEventListener
+    })
+    return true
+  }
+
+  function orderAwareAddEventListener (self, args) {
+    var eventName = args[0]
+    var handler = args[1]
+    var useCapturing = args[2] || false
+    // - Inside a Web Worker, `this` is undefined, the context is `global`
+    // - When `addEventListener` is called on the global context in strict mode, `this` is undefined
+    // see https://github.com/angular/zone.js/issues/190
+    var target = self || _global
+    var delegate = null
+    if (typeof handler === 'function') {
+      delegate = handler
+    } else if (handler && handler.handleEvent) {
+      delegate = function (event) { return handler.handleEvent(event) }
+    }
+    var validZoneHandler = false
+    try {
+      // In cross site contexts (such as WebDriver frameworks like Selenium),
+      // accessing the handler object here will cause an exception to be thrown which
+      // will fail tests prematurely.
+      validZoneHandler = handler && handler.toString() === '[object FunctionWrapper]'
+    } catch (e) {
+      // Returning nothing here is fine, because objects in a cross-site context are unusable
+      return
+    }
+    // Ignore special listeners of IE11 & Edge dev tools, see https://github.com/angular/zone.js/issues/150
+    if (!delegate || validZoneHandler) {
+      return target[SYMBOL_ADD_EVENT_LISTENER](eventName, handler, useCapturing)
+    }
+  }
+}
 
 XHRPatch.prototype.patchEventTargetMethods = function patchEventTargetMethods (obj) {
   var xhrPatch = this
@@ -160,10 +227,6 @@ XHRPatch.prototype.patchEventTargetMethods = function patchEventTargetMethods (o
     }
   }
 }
-
-var EVENT_TASKS = opbeatSymbol('eventTasks')
-var SYMBOL_ADD_EVENT_LISTENER = opbeatSymbol(ADD_EVENT_LISTENER)
-var SYMBOL_REMOVE_EVENT_LISTENER = opbeatSymbol(REMOVE_EVENT_LISTENER)
 
 function findExistingRegisteredTask (target, handler, name, capture, remove) {
   var eventTasks = target[EVENT_TASKS]
