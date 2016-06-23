@@ -56,14 +56,12 @@ function patchExceptionHandler ($provide) {
   }])
 }
 
-var patchHttp = require('./httpPatch')
 var patchController = require('./controllerPatch')
 var patchCompile = require('./compilePatch')
 var patchRootScope = require('./rootScopePatch')
 
 function patchAll ($provide, transactionService) {
   patchExceptionHandler($provide)
-  patchHttp($provide, transactionService)
   patchController($provide, transactionService)
   patchCompile($provide, transactionService)
   patchRootScope($provide, transactionService)
