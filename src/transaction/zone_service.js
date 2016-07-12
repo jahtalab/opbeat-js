@@ -24,6 +24,15 @@ function ZoneService (zone, logger, config) {
     onCancelTask: noop,
     onHandleError: noop
   }
+  var all = []
+  var t = window.performance.now()
+  function evaluateSetTimeout () {
+    var t2 = window.performance.now()
+    all.push(t2 - t)
+    t = t2
+    setTimeout(evaluateSetTimeout)
+  }
+  setTimeout(evaluateSetTimeout)
 
   var zoneConfig = {
     name: 'opbeatRootZone',
@@ -121,6 +130,7 @@ function ZoneService (zone, logger, config) {
       } else {
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
       }
+      console.log(all)
       return result
     },
     onCancelTask: function (parentZoneDelegate, currentZone, targetZone, task) {

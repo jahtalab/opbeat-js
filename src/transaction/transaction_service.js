@@ -26,6 +26,8 @@ function TransactionService (zoneService, logger, config, opbeatBackend) {
   function onBeforeInvokeTask (task) {
     if (task.source === 'XMLHttpRequest.send' && task.trace && !task.trace.ended) {
       task.trace.end()
+    } else if (task.gapTrace) {
+      task.gapTrace.end()
     }
   }
   zoneService.spec.onBeforeInvokeTask = onBeforeInvokeTask
@@ -34,6 +36,13 @@ function TransactionService (zoneService, logger, config, opbeatBackend) {
     if (task.source === 'XMLHttpRequest.send') {
       var trace = transactionService.startTrace(task['XHR']['method'] + ' ' + task['XHR']['url'], 'ext.HttpRequest', {'enableStackFrames': false})
       task.trace = trace
+    } else {
+      task.gapTrace = transactionService.startTrace(task.taskId, 'Gap', {'enableStackFrames': false})
+      try {
+        throw new Error('test')
+      } catch (e) {
+        console.log(e)
+      }
     }
     transactionService.addTask(task.taskId)
   }
