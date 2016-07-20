@@ -13,6 +13,9 @@ function Config () {
     appId: null,
     angularAppName: null,
     performance: {
+      browserResponsivenessInterval: 500,
+      browserResponsivenessBuffer: 3,
+      checkBrowserResponsiveness: true,
       enable: true,
       enableStackFrames: false,
       groupSimilarTraces: false,
