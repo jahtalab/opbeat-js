@@ -32,7 +32,15 @@ function TransactionService (zoneService, logger, config, opbeatBackend) {
 
   function onScheduleTask (task) {
     if (task.source === 'XMLHttpRequest.send') {
-      var trace = transactionService.startTrace(task['XHR']['method'] + ' ' + task['XHR']['url'], 'ext.HttpRequest', {'enableStackFrames': false})
+      var method = task['XHR']['method'] || ''
+      var url = task['XHR']['url'] || ''
+      var trName = method + ' ' + url
+
+      if (method === '' && url === '') {
+        trName = 'HttpRequest'
+      }
+
+      var trace = transactionService.startTrace(trName, 'ext.HttpRequest', {'enableStackFrames': false})
       task.trace = trace
     }
     transactionService.addTask(task.taskId)
