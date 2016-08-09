@@ -65,15 +65,24 @@ module.exports = function (config) {
       'karma-failed-reporter',
       'karma-jasmine',
       'karma-spec-reporter',
-      'karma-browserify'
+      'karma-browserify',
+      'karma-coverage'
     ],
+
+    coverageReporter: {
+      reporters: [
+        {type: 'text-summary'}
+      ],
+      dir: 'coverage/'
+    },
     browserNoActivityTimeout: 60000,
     customLaunchers: customLaunchers,
     browsers: [], // Chrome, Firefox, PhantomJS2
     captureTimeout: 120000, // on saucelabs it takes some time to capture browser
-    reporters: ['spec', 'failed'],
+    reporters: ['spec', 'failed', 'coverage'],
     browserify: {
       debug: true,
+      transform: [require('browserify-istanbul')],
       configure: function (bundle) {
         var proxyquire = require('proxyquireify')
         bundle
@@ -101,7 +110,6 @@ module.exports = function (config) {
   console.log('MODE: ' + process.env.MODE)
   console.log('Environment ANGULAR_VERSION: ' + process.env.ANGULAR_VERSION)
 
-
   if (isTravis) {
     buildId = 'OpbeatJS@' + version + ' - TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')'
     // 'karma-chrome-launcher',
@@ -111,6 +119,7 @@ module.exports = function (config) {
     buildId = 'OpbeatJS@' + version
     cfg.plugins.push('karma-chrome-launcher')
     cfg.browsers.push('Chrome')
+    cfg.coverageReporter.reporters.push({type: 'html', dir: 'coverage/'})
   // cfg.plugins.push('karma-phantomjs2-launcher')
   // cfg.browsers.push('PhantomJS2')
   }
