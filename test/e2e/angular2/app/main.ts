@@ -1,3 +1,7 @@
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule } from './app.module';
-platformBrowserDynamic().bootstrapModule(AppModule);
+import {bootstrap} from './opbeat-ng2'
+bootstrap(function () {
+  
+  platformBrowserDynamic().bootstrapModule(AppModule);
+})

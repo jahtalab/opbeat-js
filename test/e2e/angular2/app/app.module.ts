@@ -6,7 +6,7 @@ import { routing,
   appRoutingProviders } from './app.routing';
 import { HeroListComponent }    from './hero-list.component';
 import { CrisisListComponent }  from './crisis-list.component';
-
+import { HttpModule} from '@angular/http';
 
 import {Opbeat} from './opbeat-ng2'
 
@@ -14,7 +14,8 @@ import {Opbeat} from './opbeat-ng2'
   imports: [
     BrowserModule,
     FormsModule,
-    routing
+    routing,
+    HttpModule
   ],
   declarations: [
     AppComponent,

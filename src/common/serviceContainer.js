@@ -3,7 +3,7 @@ var TransactionService = require('../transaction/transaction_service')
 var utils = require('../lib/utils')
 
 if (typeof window.Zone === 'undefined') {
-  require('zone.js')
+  // require('zone.js')
 }
 
 function ServiceContainer (serviceFactory) {
